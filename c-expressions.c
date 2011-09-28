@@ -20,12 +20,17 @@ void values_reset() {
 }
 
 int main(void) {
-	char o, c, expr[BUF_SIZE];
 	int sum, i, l, j, k;
+	char o, c, expr[BUF_SIZE];
+
 	while (fgets(expr, sizeof(expr), stdin) != NULL) {
 		l = strlen(expr) - 1;	
-		if (expr[l] == '\n') {
-			expr[l] == 0;
+		for (k = l; k >= 0; k--) {
+			if (!isspace(expr[k])) {
+				break;
+			}
+
+			expr[l = k] = 0;
 		}
 
 		values_reset();
@@ -37,7 +42,7 @@ int main(void) {
 			} else if (c == '+' || c == '-') { /* Operator */
 
 				/* Incrementation and decrementation. */
-				if (i + 1 <  l && expr[i + 1] == c) {
+				if (i + 1 < l && expr[i + 1] == c) {
 
 					/* Postfix */
 					for (k = 1; i - k >= 0; k++) {
@@ -91,7 +96,7 @@ int main(void) {
 			}
 		}
 
-		printf("Expression: %s    value = %d\n", expr, sum);
+		printf("Expression: %s\n    value = %d\n", expr, sum);
 		for (j = 0; j <= VAL_SIZE; j++) {
 			if (values[j][1]) {
 				printf("    %c = %d\n", j + 'a', values[j][0]);
