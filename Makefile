@@ -12,4 +12,4 @@ clean:
 
 test: c-expressions
 	./$(BIN) < in.txt > out.txt
-	diff -b expected.txt out.txt
+	diff -b expected.txt out.txt > result.diff

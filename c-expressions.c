@@ -27,14 +27,27 @@ int main(void) {
 		}
 
 		values_reset();
-		for (o = '+', sum = i = 0; i < l; i++) {
+		for (o = sum = i = 0; i < l; i++) {
 			c = expr[i];
 			if (c == ' ') {
 				continue;
 			}
 
 			if (c == '+' || c == '-') {
-				o = c;
+				if (i + 1 < l && expr[i + 1] == c && i - 1 > 0 && expr[i - 1] >= 'a' && expr[i - 1] <= 'z') {
+					values[toInt(expr[i - 1]) - 1][0] += (c == '+' ? 1 : -1) * 1;
+
+				} else if (i + 2 < l && expr[i + 1] == c && expr[i + 2] >= 'a' && expr[i + 2] <= 'z') {
+					values[toInt(expr[i + 2]) - 1][0] += (c == '+' ? 1 : -1) * 1;
+				}
+
+				/* Forgotten operation fix. */
+				if (i - 2 > 0 && expr[i - 1] == c && (expr[i - 2] == '+' || expr[i - 2] == '-')) {
+					o = expr[i - 2];
+
+				} else {
+					o = c;
+				}
 				continue;
 			}
 
