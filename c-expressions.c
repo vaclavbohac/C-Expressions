@@ -1,3 +1,5 @@
+/* Created by Vaclav Bohac <boh0012@vsb.cz>. */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -19,7 +21,7 @@ void values_reset() {
 
 int main(void) {
 	char o, c, expr[BUF_SIZE];
-	int sum, i, l, j;
+	int sum, i, l, j, k;
 	while (fgets(expr, sizeof(expr), stdin) != NULL) {
 		l = strlen(expr) - 1;	
 		if (expr[l] == '\n') {
@@ -44,9 +46,20 @@ int main(void) {
 				}
 
 				/* Forgotten operation fix (eg. a+--b) */
-				if (i - 2 > 0 && expr[i - 1] == c && (expr[i - 2] == '+' || expr[i - 2] == '-')) {
-					o = expr[i - 2];
+				if (i - 2 > 0 && expr[i - 1] == c ) {
+					for (k = 2; (i - k) > 0; k++) {
+						if (expr[i - k] == ' ') {
+							continue;
+						}
 
+						if (expr[i - k] == '+' || expr[i - k] == '-') {
+							o = expr[i - k];
+						} else {
+							o = c;
+						}
+
+						break;
+					}
 				} else {
 					o = c;
 				}
@@ -57,10 +70,10 @@ int main(void) {
 			}
 		}
 
-		printf("Expression: %s\tvalue = %d\n", expr, sum);
+		printf("Expression: %s    value = %d\n", expr, sum);
 		for (j = 0; j <= VAL_SIZE; j++) {
 			if (values[j][1]) {
-				printf("\t%c = %d\n", j + 'a', values[j][0]);
+				printf("    %c = %d\n", j + 'a', values[j][0]);
 			}
 		}
 	}
