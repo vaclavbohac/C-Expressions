@@ -36,17 +36,38 @@ int main(void) {
 
 			} else if (c == '+' || c == '-') { /* Operator */
 
-				/* Postfix incrementation and decrementation */
-				if (i + 1 < l && expr[i + 1] == c && i - 1 > 0 && expr[i - 1] >= 'a' && expr[i - 1] <= 'z') {
-					values[toInt(expr[i - 1]) - 1][0] += (c == '+' ? 1 : -1) * 1;
+				/* Incrementation and decrementation. */
+				if (i + 1 <  l && expr[i + 1] == c) {
 
-				/* Prefix incrementation and decrementation */
-				} else if (i + 2 < l && expr[i + 1] == c && expr[i + 2] >= 'a' && expr[i + 2] <= 'z') {
-					values[toInt(expr[i + 2]) - 1][0] += (c == '+' ? 1 : -1) * 1;
+					/* Postfix */
+					for (k = 1; i - k >= 0; k++) {
+						if (expr[i - k] == ' ') {
+							continue;	
+						}
+
+						if (expr[i - k] >= 'a' && expr[i - k] <= 'z') {
+							values[toInt(expr[i - k]) - 1][0] += (c == '+' ? 1 : -1);
+						}
+
+						break;
+					}
+
+					/* Prefix */
+					for (k = 2; i + k < l; k++) {
+						if (expr[i + k] == ' ') {
+							continue;	
+						}
+
+						if (expr[i + k] >= 'a' && expr[i + k] <= 'z') {
+							values[toInt(expr[i + k]) - 1][0] += (c == '+' ? 1 : -1);
+						}
+
+						break;
+					}
 				}
 
 				/* Forgotten operation fix (eg. a+--b) */
-				if (i - 2 > 0 && expr[i - 1] == c ) {
+				if (i - 2 > 0 && expr[i - 1] == c) {
 					for (k = 2; (i - k) > 0; k++) {
 						if (expr[i - k] == ' ') {
 							continue;
