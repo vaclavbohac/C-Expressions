@@ -29,40 +29,39 @@ int main(void) {
 		values_reset();
 		for (o = sum = i = 0; i < l; i++) {
 			c = expr[i];
-			if (c == ' ') {
+			if (c == ' ') { /* Whitespace */
 				continue;
-			}
 
-			if (c == '+' || c == '-') {
+			} else if (c == '+' || c == '-') { /* Operator */
+
+				/* Postfix incrementation and decrementation */
 				if (i + 1 < l && expr[i + 1] == c && i - 1 > 0 && expr[i - 1] >= 'a' && expr[i - 1] <= 'z') {
 					values[toInt(expr[i - 1]) - 1][0] += (c == '+' ? 1 : -1) * 1;
 
+				/* Prefix incrementation and decrementation */
 				} else if (i + 2 < l && expr[i + 1] == c && expr[i + 2] >= 'a' && expr[i + 2] <= 'z') {
 					values[toInt(expr[i + 2]) - 1][0] += (c == '+' ? 1 : -1) * 1;
 				}
 
-				/* Forgotten operation fix. */
+				/* Forgotten operation fix (eg. a+--b) */
 				if (i - 2 > 0 && expr[i - 1] == c && (expr[i - 2] == '+' || expr[i - 2] == '-')) {
 					o = expr[i - 2];
 
 				} else {
 					o = c;
 				}
-				continue;
-			}
 
-			values[toInt(c) - 1][1] = 1;
-			if (sum == 0) {
-				sum = values[toInt(c) - 1][0];
-			} else {
-				sum += (o == '+' ? 1 : -1) * values[toInt(c) - 1][0];
+			} else { /* Value */
+				values[toInt(c) - 1][1] = 1;
+				sum += (o == 0 || o == '+' ? 1 : -1) * values[toInt(c) - 1][0];
 			}
 		}
 
 		printf("Expression: %s\tvalue = %d\n", expr, sum);
 		for (j = 0; j <= VAL_SIZE; j++) {
-			if (values[j][1])
+			if (values[j][1]) {
 				printf("\t%c = %d\n", j + 'a', values[j][0]);
+			}
 		}
 	}
 	return EXIT_SUCCESS;
