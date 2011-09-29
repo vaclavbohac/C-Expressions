@@ -4,104 +4,116 @@
 #include <string.h>
 #include <stdio.h>
 
-#define toInt(i) (i - 'a' + 1)
-
 #define BUF_SIZE 111
-#define VAL_SIZE 'z' - 'a' + 1
 
-int values[VAL_SIZE][2];
+int values['z'][3];
 
 void values_reset() {
 	int i;
-	for (i = 0; i < VAL_SIZE; i++) {
+	for (i = 0; i < 'z' - 'a' + 1; i++) {
 		values[i][0] = i + 1;
-		values[i][1] = 0;
+		values[i][1] = i + 1;
+		values[i][2] = 0;
 	}
 }
 
+int strip_whitespace(char *str) {
+	char tmp[BUF_SIZE];
+	int i, j, l;
+
+	for (i = j = 0, l = strlen(str); i < l; i++) {
+		if (!isspace(str[i])) {
+			tmp[j++] = str[i];	
+			tmp[j] = 0;
+		}
+	}
+
+	strncpy(str, tmp, j);
+	str[j] = 0;
+
+	return j;
+}
+
 int main(void) {
-	int sum, i, l, j, k;
-	char o, c, expr[BUF_SIZE];
+	char input[BUF_SIZE], expr[BUF_SIZE];
+	int i, j, length_input, length_expr,
+	    operation, result;
 
-	while (fgets(expr, sizeof(expr), stdin) != NULL) {
-		l = strlen(expr) - 1;	
-		for (k = l; k >= 0; k--) {
-			if (!isspace(expr[k])) {
-				break;
-			}
+	while (fgets(input, sizeof(input), stdin) != NULL) {
 
-			expr[l = k] = 0;
-		}
-
+		/* Reset table of values */
 		values_reset();
-		for (o = sum = i = 0; i < l; i++) {
-			c = expr[i];
-			if (c == ' ') { /* Whitespace */
+
+		/* Get rid of trailing newline. */
+		length_input = strlen(input);
+		if (input[length_input - 1] == '\n') {
+			input[--length_input] = 0;
+		}
+
+		expr[0] = 0; /* Clear buffer.  */
+
+		/* Copy input to expr. */
+		strcpy(expr, input);
+
+		/* Get rid of whitespace. */
+		length_expr = strip_whitespace(expr);
+
+		/** Get rid of prefixes. */
+		for (i = 0; i < length_expr; i++) {
+			if (isalpha(expr[i]) || isspace(expr[i])) {
 				continue;
+			}
 
-			} else if (c == '+' || c == '-') { /* Operator */
+			if (i + 2 < length_expr && expr[i] == expr[i + 1] && isalpha(expr[i + 2])) {
+				j = expr[i + 2] - 'a';
+				values[j][0] = values[j][1] += expr[i] == '+' ? 1 : -1;
 
-				/* Incrementation and decrementation. */
-				if (i + 1 < l && expr[i + 1] == c) {
-
-					/* Postfix */
-					for (k = 1; i - k >= 0; k++) {
-						if (expr[i - k] == ' ') {
-							continue;	
-						}
-
-						if (expr[i - k] >= 'a' && expr[i - k] <= 'z') {
-							values[toInt(expr[i - k]) - 1][0] += (c == '+' ? 1 : -1);
-						}
-
-						break;
-					}
-
-					/* Prefix */
-					for (k = 2; i + k < l; k++) {
-						if (expr[i + k] == ' ') {
-							continue;	
-						}
-
-						if (expr[i + k] >= 'a' && expr[i + k] <= 'z') {
-							values[toInt(expr[i + k]) - 1][0] += (c == '+' ? 1 : -1);
-						}
-
-						break;
-					}
-				}
-
-				/* Forgotten operation fix (eg. a+--b) */
-				if (i - 2 > 0 && expr[i - 1] == c) {
-					for (k = 2; (i - k) > 0; k++) {
-						if (expr[i - k] == ' ') {
-							continue;
-						}
-
-						if (expr[i - k] == '+' || expr[i - k] == '-') {
-							o = expr[i - k];
-						} else {
-							o = c;
-						}
-
-						break;
-					}
-				} else {
-					o = c;
-				}
-
-			} else { /* Value */
-				values[toInt(c) - 1][1] = 1;
-				sum += (o == 0 || o == '+' ? 1 : -1) * values[toInt(c) - 1][0];
+				/* Replace prefix operators with spaces. */
+				expr[i] = ' ';
+				expr[i + 1] = ' ';
 			}
 		}
 
-		printf("Expression: %s\n    value = %d\n", expr, sum);
-		for (j = 0; j <= VAL_SIZE; j++) {
-			if (values[j][1]) {
-				printf("    %c = %d\n", j + 'a', values[j][0]);
+		/* Get rid of whitespace. */
+		length_expr = strip_whitespace(expr);
+
+		/* Get rid of postfixes. */
+		for (i = 1; i < length_expr; i++) {
+			if (isalpha(expr[i]) || isspace(expr[i])) {
+				continue;
+			}
+
+			if (i + 1 < length_expr && expr[i] == expr[i + 1]) {
+				values[expr[i - 1] - 'a'][1] += expr[i] == '+' ? 1 : -1;
+
+				/* Replace postfix operators with spaces. */
+				expr[i] = ' ';
+				expr[i + 1] = ' ';
+			}
+		}
+
+		/* Get rid of whitespace. */
+		length_expr = strip_whitespace(expr);
+
+		/* Solve expression. */
+		for (i = result = operation = 0; i < length_expr; i++) {
+			if (isalpha(expr[i])) {
+				values[expr[i] - 'a'][2] = 1;
+				result += values[expr[i] - 'a'][0] * (operation == 0 || operation == '+' ? 1 : -1);
+
+			} else {
+				operation = expr[i];
+			}
+		}
+
+
+		printf("Expression: %s\n    value = %d\n", input, result);
+		for (i = 0; i < 'z'; i++) {
+			if (values[i][2]) {
+				printf("    %c = %d\n", 'a' + i, values[i][1]);
 			}
 		}
 	}
+
 	return EXIT_SUCCESS;
 }

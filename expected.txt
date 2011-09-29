@@ -22,3 +22,33 @@ Expression:    f-- + c-- + d-++e
     d = 4
     e = 6
     f = 5
+Expression: --a + z
+    value = 26
+    a = 0
+    z = 26
+Expression: --a - ++b
+    value = -3
+    a = 0
+    b = 3
+Expression: --a - b++
+    value = -2
+    a = 0
+    b = 3
+Expression: a + b  
+    value = 3
+    a = 1
+    b = 2
+Expression: d + --d + d++
+    value = 9
+    d = 4
+Expression: f--+--a + a ++
+    value = 6
+    a = 1
+    f = 5
+Expression: f -- + -- a + a ++
+    value = 6
+    a = 1
+    f = 5
+Expression: f + +
+    value = 6
+    f = 7
