@@ -6,7 +6,7 @@
 
 #define BUF_SIZE 111
 
-int values['z'][3];
+int values[26][3];
 
 void values_reset() {
 	int i;
