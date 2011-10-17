@@ -2,7 +2,7 @@ all: c-expressions
 
 BIN = c-expressions
 
-CFLAGS += -lm -lcrypt -O2 -pipe -ansi -DONLINE_JUDGE
+CFLAGS += -lm -O2 -pipe -ansi -DONLINE_JUDGE
 
 c-expressions: c-expressions.c
 	gcc $(CFLAGS) -o $(BIN) $<
